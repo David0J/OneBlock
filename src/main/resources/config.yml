@@ -1,0 +1,70 @@
+world:
+  name: "oneblock_world"
+  spawn-y: 64
+  spacing: 1000
+
+progression:
+  thresholds:
+    # level 0 starts at 0 automatically
+    1: 100
+    2: 500
+    3: 1500
+    4: 5000
+    5: 10000
+
+block-pools:
+  0:
+    - DIRT
+    - GRASS_BLOCK
+    - OAK_LOG
+    - OAK_LEAVES
+    - DANDELION
+    - POPPY
+    - SHORT_GRASS
+    - MOSS_BLOCK
+  1:
+    - DIRT
+    - GRASS_BLOCK
+    - OAK_LOG
+    - BIRCH_LOG
+    - SPRUCE_LOG
+    - COBBLESTONE
+    - COAL_ORE
+    - SAND
+    - GRAVEL
+    - CLAY
+  2:
+    - STONE
+    - COBBLESTONE
+    - IRON_ORE
+    - COPPER_ORE
+    - ANDESITE
+    - DIORITE
+    - GRANITE
+    - MUD
+  3:
+    - GOLD_ORE
+    - REDSTONE_ORE
+    - LAPIS_ORE
+    - DEEPSLATE
+    - TUFF
+    - NETHERRACK
+    - SOUL_SAND
+    - NETHER_QUARTZ_ORE
+  4:
+    - DIAMOND_ORE
+    - EMERALD_ORE
+    - OBSIDIAN
+    - MAGMA_BLOCK
+    - ANCIENT_DEBRIS
+    - END_STONE
+    - GLOWSTONE
+  5:
+    - DIAMOND_ORE
+    - EMERALD_ORE
+    - OBSIDIAN
+    - ANCIENT_DEBRIS
+    - END_STONE
+    - CRYING_OBSIDIAN
+    - NETHER_QUARTZ_ORE
+    - NETHER_GOLD_ORE
