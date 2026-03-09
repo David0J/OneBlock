@@ -1,0 +1,12 @@
+world:
+  name: oneblock_world
+  spawn-y: 64
+  spacing: 1000
+
+levels:
+  0: 0
+  1: 100
+  2: 500
+  3: 1500
+  4: 5000
+  5: 10000
