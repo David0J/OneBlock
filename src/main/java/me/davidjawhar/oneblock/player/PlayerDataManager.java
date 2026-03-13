@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PlayerDataManager {
+
     private final OneBlockPlugin plugin;
     private final File file;
     private final YamlConfiguration yaml;
@@ -18,56 +19,91 @@ public class PlayerDataManager {
     public PlayerDataManager(OneBlockPlugin plugin) {
         this.plugin = plugin;
         this.file = new File(plugin.getDataFolder(), "players.yml");
+
+        if (!plugin.getDataFolder().exists()) {
+            plugin.getDataFolder().mkdirs();
+        }
+
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                plugin.getLogger().severe("Could not create players.yml");
+            }
+        }
+
         this.yaml = YamlConfiguration.loadConfiguration(file);
         load();
     }
 
-    private void load() {
-        var section = yaml.getConfigurationSection("players");
-        if (section == null) return;
-        for (String key : section.getKeys(false)) {
+    public void load() {
+        cache.clear();
+
+        if (yaml.getConfigurationSection("players") == null) return;
+
+        for (String key : yaml.getConfigurationSection("players").getKeys(false)) {
             UUID uuid = UUID.fromString(key);
-            String path = "players." + key + ".";
-            PlayerData data = new PlayerData(uuid, yaml.getString(path + "name", "Unknown"));
-            data.setLevel(yaml.getInt(path + "level", 0));
-            data.setBlocksBroken(yaml.getLong(path + "blocksBroken", 0));
-            data.setDateCreated(yaml.getLong(path + "dateCreated", System.currentTimeMillis()));
-            data.setLastLogin(yaml.getLong(path + "lastLogin", System.currentTimeMillis()));
-            cache.put(uuid, data);
+            String path = "players." + key;
+            String name = yaml.getString(path + ".name", "Unknown");
+            int blocksBroken = yaml.getInt(path + ".blocksBroken", 0);
+            int level = yaml.getInt(path + ".level", 0);
+
+            cache.put(uuid, new PlayerData(uuid, name, blocksBroken, level));
+        }
+    }
+
+    public void save() {
+        yaml.set("players", null);
+
+        for (PlayerData data : cache.values()) {
+            String path = "players." + data.getUuid();
+            yaml.set(path + ".name", data.getName());
+            yaml.set(path + ".blocksBroken", data.getBlocksBroken());
+            yaml.set(path + ".level", data.getLevel());
+        }
+
+        try {
+            yaml.save(file);
+        } catch (IOException e) {
+            plugin.getLogger().severe("Could not save players.yml");
         }
     }
 
     public PlayerData getOrCreate(UUID uuid, String name) {
         PlayerData data = cache.get(uuid);
         if (data == null) {
-            data = new PlayerData(uuid, name);
+            data = new PlayerData(uuid, name, 0, 0);
             cache.put(uuid, data);
+            save();
+        } else if (!data.getName().equals(name)) {
+            data.setName(name);
+            save();
         }
-        data.setName(name);
-        data.setLastLogin(System.currentTimeMillis());
         return data;
     }
 
-    public PlayerData get(UUID uuid) {
-        return cache.get(uuid);
+    public void incrementBlocksBroken(UUID uuid, String name) {
+        PlayerData data = getOrCreate(uuid, name);
+        data.setBlocksBroken(data.getBlocksBroken() + 1);
     }
 
-    public Map<UUID, PlayerData> all() { return cache; }
+    public void setLevel(UUID uuid, String name, int level) {
+        PlayerData data = getOrCreate(uuid, name);
+        data.setLevel(level);
+    }
 
-    public void save() {
-        yaml.set("players", null);
-        for (PlayerData data : cache.values()) {
-            String path = "players." + data.getUuid() + ".";
-            yaml.set(path + "name", data.getName());
-            yaml.set(path + "level", data.getLevel());
-            yaml.set(path + "blocksBroken", data.getBlocksBroken());
-            yaml.set(path + "dateCreated", data.getDateCreated());
-            yaml.set(path + "lastLogin", data.getLastLogin());
-        }
-        try {
-            yaml.save(file);
-        } catch (IOException e) {
-            plugin.getLogger().warning("Failed to save players.yml: " + e.getMessage());
-        }
+    public int getBlocksBroken(UUID uuid, String name) {
+        return getOrCreate(uuid, name).getBlocksBroken();
+    }
+
+    public int getLevel(UUID uuid, String name) {
+        return getOrCreate(uuid, name).getLevel();
+    }
+
+    public void reset(UUID uuid, String name) {
+        PlayerData data = getOrCreate(uuid, name);
+        data.setBlocksBroken(0);
+        data.setLevel(0);
+        save();
     }
 }
