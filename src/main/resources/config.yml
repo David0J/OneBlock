@@ -1,16 +1,19 @@
-world:
-  name: "oneblock_world"
-  spawn-y: 64
-  spacing: 1000
+world-name: oneblock_world
+world-y: 64
+island-spacing: 1000
+regeneration-delay-ticks: 1
+show-level-bossbar: true
+bossbar-title-format: "&5Level %level%"
+owner-only-break: true
+teleport-returning-on-join: true
 
-progression:
-  thresholds:
-    # level 0 starts at 0 automatically
-    1: 100
-    2: 500
-    3: 1500
-    4: 5000
-    5: 10000
+level-thresholds:
+  0: 0
+  1: 100
+  2: 500
+  3: 1500
+  4: 5000
+  5: 10000
 
 block-pools:
   0:
@@ -19,7 +22,6 @@ block-pools:
     - OAK_LOG
     - OAK_LEAVES
     - DANDELION
-    - POPPY
     - SHORT_GRASS
     - MOSS_BLOCK
   1:
@@ -56,9 +58,9 @@ block-pools:
     - EMERALD_ORE
     - OBSIDIAN
     - MAGMA_BLOCK
-    - ANCIENT_DEBRIS
-    - END_STONE
     - GLOWSTONE
+    - END_STONE
+    - ANCIENT_DEBRIS
   5:
     - DIAMOND_ORE
     - EMERALD_ORE
