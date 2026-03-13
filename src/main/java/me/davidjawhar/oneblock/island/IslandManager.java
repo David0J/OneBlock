@@ -163,6 +163,10 @@ public class IslandManager {
         String worldName = plugin.getConfig().getString("world-name", "oneblock_world");
         return Bukkit.getWorld(worldName);
     }
+    
+    public Map<UUID, IslandData> getAllIslands() {
+        return islands;
+    }
 
     public void teleportHome(Player player) {
         IslandData data = getOrCreateIsland(player);
