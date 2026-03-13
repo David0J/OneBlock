@@ -1,12 +1,10 @@
 package me.davidjawhar.oneblock.ui;
 
 import me.davidjawhar.oneblock.OneBlockPlugin;
-import me.davidjawhar.oneblock.island.IslandManager;
+import me.davidjawhar.oneblock.level.LevelManager;
 import me.davidjawhar.oneblock.player.PlayerData;
 import me.davidjawhar.oneblock.player.PlayerDataManager;
-import me.davidjawhar.oneblock.level.LevelManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -17,51 +15,84 @@ import java.util.Map;
 import java.util.UUID;
 
 public class BossBarManager {
+
     private final OneBlockPlugin plugin;
     private final PlayerDataManager playerDataManager;
     private final LevelManager levelManager;
-    private final IslandManager islandManager;
     private final Map<UUID, BossBar> bars = new HashMap<>();
 
-    public BossBarManager(OneBlockPlugin plugin, PlayerDataManager playerDataManager, LevelManager levelManager, IslandManager islandManager) {
+    public BossBarManager(OneBlockPlugin plugin,
+                          PlayerDataManager playerDataManager,
+                          LevelManager levelManager) {
         this.plugin = plugin;
         this.playerDataManager = playerDataManager;
         this.levelManager = levelManager;
-        this.islandManager = islandManager;
     }
 
     public void show(Player player) {
-        if (!plugin.getConfig().getBoolean("show-level-bossbar", true)) return;
-        if (!islandManager.isInOneBlockWorld(player)) return;
-        PlayerData data = playerDataManager.getOrCreate(player.getUniqueId(), player.getName());
-        BossBar bar = bars.computeIfAbsent(player.getUniqueId(), id -> Bukkit.createBossBar("", BarColor.PURPLE, BarStyle.SOLID));
-        bar.setTitle(colorize(plugin.getConfig().getString("bossbar-title-format", "&5Level %level%").replace("%level%", String.valueOf(data.getLevel()))));
-        bar.setProgress(1.0);
-        if (!bar.getPlayers().contains(player)) bar.addPlayer(player);
+        BossBar bar = bars.computeIfAbsent(player.getUniqueId(), uuid ->
+                Bukkit.createBossBar("Level 0", BarColor.PURPLE, BarStyle.SOLID));
+
+        if (!bar.getPlayers().contains(player)) {
+            bar.addPlayer(player);
+        }
+
         bar.setVisible(true);
+        update(player);
     }
 
     public void hide(Player player) {
         BossBar bar = bars.get(player.getUniqueId());
-        if (bar != null) bar.removePlayer(player);
+        if (bar != null) {
+            bar.removePlayer(player);
+            bar.setVisible(false);
+        }
     }
 
     public void update(Player player) {
-        show(player);
+        PlayerData data = playerDataManager.getOrCreate(player.getUniqueId(), player.getName());
+        int blocksBroken = data.getBlocksBroken();
+        int level = levelManager.getLevel(blocksBroken);
+
+        playerDataManager.setLevel(player.getUniqueId(), player.getName(), level);
+
+        int currentMin = levelManager.getLevelMinBlocks(level);
+        int nextMin = levelManager.getNextLevelMinBlocks(level);
+
+        double progress;
+        if (level >= 5 || nextMin <= currentMin) {
+            progress = 1.0;
+        } else {
+            progress = (double) (blocksBroken - currentMin) / (double) (nextMin - currentMin);
+        }
+
+        progress = Math.max(0.0, Math.min(1.0, progress));
+
+        BossBar bar = bars.computeIfAbsent(player.getUniqueId(), uuid ->
+                Bukkit.createBossBar("Level 0", BarColor.PURPLE, BarStyle.SOLID));
+
+        bar.setTitle("§5Level " + level + " §7(" + blocksBroken + " broken)");
+        bar.setProgress(progress);
+        bar.setColor(BarColor.PURPLE);
+        bar.setStyle(BarStyle.SOLID);
+
+        if (!bar.getPlayers().contains(player)) {
+            bar.addPlayer(player);
+        }
+
+        bar.setVisible(true);
     }
 
-    public void refreshAll() {
-        for (Player player : Bukkit.getOnlinePlayers()) show(player);
+    public void updateAll() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            show(player);
+        }
     }
 
-    public void clearAll() {
+    public void removeAll() {
         for (BossBar bar : bars.values()) {
             bar.removeAll();
         }
         bars.clear();
-    }
-
-    private String colorize(String s) {
-        return ChatColor.translateAlternateColorCodes('&', s);
     }
 }
