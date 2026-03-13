@@ -1,0 +1,72 @@
+world-name: oneblock_world
+world-y: 64
+island-spacing: 1000
+regeneration-delay-ticks: 1
+show-level-bossbar: true
+bossbar-title-format: "&5Level %level%"
+owner-only-break: true
+teleport-returning-on-join: true
+
+level-thresholds:
+  0: 0
+  1: 100
+  2: 500
+  3: 1500
+  4: 5000
+  5: 10000
+
+block-pools:
+  0:
+    - DIRT
+    - GRASS_BLOCK
+    - OAK_LOG
+    - OAK_LEAVES
+    - DANDELION
+    - SHORT_GRASS
+    - MOSS_BLOCK
+  1:
+    - DIRT
+    - GRASS_BLOCK
+    - OAK_LOG
+    - BIRCH_LOG
+    - SPRUCE_LOG
+    - COBBLESTONE
+    - COAL_ORE
+    - SAND
+    - GRAVEL
+    - CLAY
+  2:
+    - STONE
+    - COBBLESTONE
+    - IRON_ORE
+    - COPPER_ORE
+    - ANDESITE
+    - DIORITE
+    - GRANITE
+    - MUD
+  3:
+    - GOLD_ORE
+    - REDSTONE_ORE
+    - LAPIS_ORE
+    - DEEPSLATE
+    - TUFF
+    - NETHERRACK
+    - SOUL_SAND
+    - NETHER_QUARTZ_ORE
+  4:
+    - DIAMOND_ORE
+    - EMERALD_ORE
+    - OBSIDIAN
+    - MAGMA_BLOCK
+    - GLOWSTONE
+    - END_STONE
+    - ANCIENT_DEBRIS
+  5:
+    - DIAMOND_ORE
+    - EMERALD_ORE
+    - OBSIDIAN
+    - ANCIENT_DEBRIS
+    - END_STONE
+    - CRYING_OBSIDIAN
+    - NETHER_QUARTZ_ORE
+    - NETHER_GOLD_ORE
