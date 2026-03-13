@@ -2,6 +2,8 @@ package me.davidjawhar.oneblock.island;
 
 import org.bukkit.Location;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class IslandData {
@@ -12,6 +14,7 @@ public class IslandData {
     private final int y;
     private final int z;
     private final String worldName;
+    private final Set<UUID> trusted = new HashSet<>();
 
     public IslandData(UUID owner, int index, int x, int y, int z, String worldName) {
         this.owner = owner;
@@ -44,6 +47,22 @@ public class IslandData {
 
     public String getWorldName() {
         return worldName;
+    }
+
+    public Set<UUID> getTrusted() {
+        return trusted;
+    }
+
+    public void trust(UUID uuid) {
+        trusted.add(uuid);
+    }
+
+    public void untrust(UUID uuid) {
+        trusted.remove(uuid);
+    }
+
+    public boolean isTrusted(UUID uuid) {
+        return owner.equals(uuid) || trusted.contains(uuid);
     }
 
     public boolean isOneBlock(Location location) {

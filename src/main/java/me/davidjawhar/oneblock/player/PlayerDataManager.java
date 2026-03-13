@@ -38,30 +38,39 @@ public class PlayerDataManager {
 
     public void load() {
         cache.clear();
-
         if (yaml.getConfigurationSection("players") == null) return;
 
         for (String key : yaml.getConfigurationSection("players").getKeys(false)) {
             UUID uuid = UUID.fromString(key);
             String path = "players." + key;
-            String name = yaml.getString(path + ".name", "Unknown");
-            int blocksBroken = yaml.getInt(path + ".blocksBroken", 0);
-            int level = yaml.getInt(path + ".level", 0);
-
-            cache.put(uuid, new PlayerData(uuid, name, blocksBroken, level));
+            PlayerData data = new PlayerData(
+                    uuid,
+                    yaml.getString(path + ".name", "Unknown"),
+                    yaml.getInt(path + ".blocksBroken", 0),
+                    yaml.getInt(path + ".level", 0)
+            );
+            data.setIronOresBroken(yaml.getInt(path + ".ironOresBroken", 0));
+            data.setAnimalSpawnerGiven(yaml.getBoolean(path + ".animalSpawnerGiven", false));
+            data.setHostileSpawnerGiven(yaml.getBoolean(path + ".hostileSpawnerGiven", false));
+            data.setEndSpawnerGiven(yaml.getBoolean(path + ".endSpawnerGiven", false));
+            data.setNextHungerCheckpoint(yaml.getInt(path + ".nextHungerCheckpoint", 75));
+            cache.put(uuid, data);
         }
     }
 
     public void save() {
         yaml.set("players", null);
-
         for (PlayerData data : cache.values()) {
             String path = "players." + data.getUuid();
             yaml.set(path + ".name", data.getName());
             yaml.set(path + ".blocksBroken", data.getBlocksBroken());
             yaml.set(path + ".level", data.getLevel());
+            yaml.set(path + ".ironOresBroken", data.getIronOresBroken());
+            yaml.set(path + ".animalSpawnerGiven", data.isAnimalSpawnerGiven());
+            yaml.set(path + ".hostileSpawnerGiven", data.isHostileSpawnerGiven());
+            yaml.set(path + ".endSpawnerGiven", data.isEndSpawnerGiven());
+            yaml.set(path + ".nextHungerCheckpoint", data.getNextHungerCheckpoint());
         }
-
         try {
             yaml.save(file);
         } catch (IOException e) {
@@ -75,9 +84,8 @@ public class PlayerDataManager {
             data = new PlayerData(uuid, name, 0, 0);
             cache.put(uuid, data);
             save();
-        } else if (!data.getName().equals(name)) {
+        } else if (name != null && !data.getName().equals(name)) {
             data.setName(name);
-            save();
         }
         return data;
     }
@@ -87,23 +95,26 @@ public class PlayerDataManager {
         data.setBlocksBroken(data.getBlocksBroken() + 1);
     }
 
-    public void setLevel(UUID uuid, String name, int level) {
+    public void incrementIronOresBroken(UUID uuid, String name) {
         PlayerData data = getOrCreate(uuid, name);
-        data.setLevel(level);
+        data.setIronOresBroken(data.getIronOresBroken() + 1);
     }
 
-    public int getBlocksBroken(UUID uuid, String name) {
-        return getOrCreate(uuid, name).getBlocksBroken();
-    }
-
-    public int getLevel(UUID uuid, String name) {
-        return getOrCreate(uuid, name).getLevel();
-    }
+    public int getBlocksBroken(UUID uuid, String name) { return getOrCreate(uuid, name).getBlocksBroken(); }
+    public int getLevel(UUID uuid, String name) { return getOrCreate(uuid, name).getLevel(); }
+    public int getIronOresBroken(UUID uuid, String name) { return getOrCreate(uuid, name).getIronOresBroken(); }
+    public void setLevel(UUID uuid, String name, int level) { getOrCreate(uuid, name).setLevel(level); }
+    public PlayerData get(UUID uuid, String name) { return getOrCreate(uuid, name); }
 
     public void reset(UUID uuid, String name) {
         PlayerData data = getOrCreate(uuid, name);
         data.setBlocksBroken(0);
         data.setLevel(0);
+        data.setIronOresBroken(0);
+        data.setAnimalSpawnerGiven(false);
+        data.setHostileSpawnerGiven(false);
+        data.setEndSpawnerGiven(false);
+        data.setNextHungerCheckpoint(75);
         save();
     }
 }
