@@ -1,7 +1,7 @@
 world-name: oneblock_world
 world-y: 64
 island-spacing: 1000
-regeneration-delay-ticks: 1
+regeneration-delay-ticks: 20
 show-level-bossbar: true
 bossbar-title-format: "&5Level %level%"
 owner-only-break: true
