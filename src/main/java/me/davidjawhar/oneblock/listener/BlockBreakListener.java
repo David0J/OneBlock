@@ -126,7 +126,6 @@ public class BlockBreakListener implements Listener {
             }
             case ORE_CLUSTER_BLOCK -> Bukkit.getScheduler().runTaskLater(plugin, () -> generateOreCluster(player, block), 1L);
 
-            // TNT now stays as a normal TNT block and does NOT ignite automatically
             case TNT_BLOCK -> block.setType(Material.TNT);
 
             default -> {}
@@ -142,7 +141,6 @@ public class BlockBreakListener implements Listener {
         switch (oldType) {
             case BARREL -> dropChestLoot(world, dropLoc, uuid, name);
 
-            // TNT should behave like a normal block reward now
             case TNT -> world.dropItemNaturally(dropLoc, new ItemStack(Material.TNT, 1));
 
             default -> {

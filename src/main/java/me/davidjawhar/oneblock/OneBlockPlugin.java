@@ -9,10 +9,14 @@ import me.davidjawhar.oneblock.listener.ProtectListener;
 import me.davidjawhar.oneblock.player.PlayerDataManager;
 import me.davidjawhar.oneblock.ui.BossBarManager;
 import me.davidjawhar.oneblock.world.VoidChunkGenerator;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Material;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -53,7 +57,16 @@ public class OneBlockPlugin extends JavaPlugin {
         }
 
         registerRecipes();
+
         Bukkit.getScheduler().runTaskTimer(this, bossBarManager::updateAll, 40L, 40L);
+
+        // show bar for players already online after /reload or plugin reload
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                bossBarManager.show(player);
+            }
+        }, 20L);
+
         getLogger().info("OneBlock enabled.");
     }
 

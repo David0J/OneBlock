@@ -140,7 +140,6 @@ public class LevelManager {
             add(pool, 3, Material.NETHER_GOLD_ORE);
         }
 
-        // gated utility liquids represented safely as blocks that can still be broken
         if (iron >= 5) {
             add(pool, 3, Material.ICE);
         }
