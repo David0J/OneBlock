@@ -79,7 +79,9 @@ public class LevelManager {
         pool.add(new WeightedEntry(4, new GenerationOutcome(GenerationOutcome.Type.CHEST_BLOCK, Material.BARREL)));
         pool.add(new WeightedEntry(5, new GenerationOutcome(GenerationOutcome.Type.TREE_BLOCK, Material.MOSS_BLOCK)));
         pool.add(new WeightedEntry(4, new GenerationOutcome(GenerationOutcome.Type.ORE_CLUSTER_BLOCK, Material.TUFF)));
-        pool.add(new WeightedEntry(2, new GenerationOutcome(GenerationOutcome.Type.TNT_BLOCK, Material.TNT)));
+
+        // TNT is intentionally rarer now
+        pool.add(new WeightedEntry(1, new GenerationOutcome(GenerationOutcome.Type.TNT_BLOCK, Material.TNT)));
 
         // level 0 base
         add(pool, 24, Material.DIRT);

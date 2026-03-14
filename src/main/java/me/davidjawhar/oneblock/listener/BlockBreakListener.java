@@ -12,7 +12,8 @@ import me.davidjawhar.oneblock.ui.BossBarManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -107,6 +108,7 @@ public class BlockBreakListener implements Listener {
         if (!above.isEmpty()) above.setType(Material.AIR);
 
         Material display = outcome.getDisplayMaterial();
+
         if (!display.isSolid()) {
             block.setType(Material.DIRT);
             Bukkit.getScheduler().runTask(plugin, () -> above.setType(display));
@@ -123,7 +125,10 @@ public class BlockBreakListener implements Listener {
                 }, 1L);
             }
             case ORE_CLUSTER_BLOCK -> Bukkit.getScheduler().runTaskLater(plugin, () -> generateOreCluster(player, block), 1L);
-            case TNT_BLOCK -> Bukkit.getScheduler().runTaskLater(plugin, () -> igniteTnt(block), 1L);
+
+            // TNT now stays as a normal TNT block and does NOT ignite automatically
+            case TNT_BLOCK -> block.setType(Material.TNT);
+
             default -> {}
         }
     }
@@ -136,10 +141,10 @@ public class BlockBreakListener implements Listener {
 
         switch (oldType) {
             case BARREL -> dropChestLoot(world, dropLoc, uuid, name);
-            case TNT -> {
-                // no block drop; TNT effect handled on regen when TNT appears next time
-                return;
-            }
+
+            // TNT should behave like a normal block reward now
+            case TNT -> world.dropItemNaturally(dropLoc, new ItemStack(Material.TNT, 1));
+
             default -> {
                 Collection<ItemStack> normalDrops = block.getDrops(player.getInventory().getItemInMainHand(), player);
                 if (normalDrops.isEmpty()) {
@@ -193,14 +198,6 @@ public class BlockBreakListener implements Listener {
         if (centerMaterial == Material.TUFF) {
             center.getWorld().playSound(center.getLocation(), Sound.BLOCK_STONE_BREAK, 1f, 1f);
         }
-    }
-
-    private void igniteTnt(Block block) {
-        World world = block.getWorld();
-        block.setType(Material.AIR);
-        TNTPrimed primed = world.spawn(block.getLocation().add(0.5, 0.0, 0.5), TNTPrimed.class);
-        primed.setFuseTicks(40);
-        primed.setYield(2.0f);
     }
 
     private void spawnMob(Location loc, MobSpawnerData.Type type) {
